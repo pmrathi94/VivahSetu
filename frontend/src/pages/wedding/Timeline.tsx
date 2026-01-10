@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, MapPin, CheckCircle, AlertCircle } from 'lucide-react';
-import apiClient from '../../lib/api-client';
+import { apiClient } from '../../lib/api-client';
 
 interface TimelineFunction {
   function_id: string;
@@ -31,7 +31,7 @@ interface TimelineData {
   };
 }
 
-export default function Timeline() {
+export function TimelinePage() {
   const [timelineData, setTimelineData] = useState<TimelineData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -149,7 +149,7 @@ export default function Timeline() {
 
             {/* Timeline items */}
             <div className="space-y-8">
-              {timelineData.timeline.map((func, index) => {
+              {timelineData.timeline.map((func) => {
                 const badge = getStatusBadge(func.status);
                 const funcDate = new Date(func.date);
                 const formattedDate = funcDate.toLocaleDateString('en-IN', {

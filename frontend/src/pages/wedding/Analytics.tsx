@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AlertCircle, TrendingUp, Users, Calendar, DollarSign } from 'lucide-react';
-import apiClient from '../../lib/api-client';
+import { apiClient } from '../../lib/api-client';
 
 interface DashboardStats {
   budget: { total: number; spent: number };
@@ -10,7 +10,7 @@ interface DashboardStats {
   updated_at: string;
 }
 
-export default function Analytics() {
+export function AnalyticsPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

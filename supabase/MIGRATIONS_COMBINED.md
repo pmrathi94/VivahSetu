@@ -1,119 +1,94 @@
-# VivahSetu - Combined SQL Migrations
 
-This document combines the SQL migration files found in `supabase/migrations/` into a single, ordered reference. Use the individual files for automated migration tools (recommended). The snippets below are provided for convenience and manual inspection.
+
+
+
+# VivahSetu 2026 - Database Migration
+
+## Single Consolidated Migration
+
+This project uses **ONE** consolidated migration file:
+
+**File:** [supabase/migrations/000_all_full.sql](migrations/000_all_full.sql)
+
+This file contains:
+- All 26+ mandatory tables (users, weddings, roles, wedding_members, rituals, functions, venues, vendors, menus, budgets, expenses, chats, messages, media_assets, packing_items, guests, surprise_plans, audit_logs, otp_codes, etc.)
+- All visibility types and enums (BRIDE_ONLY, GROOM_ONLY, SHARED, FAMILY_VISIBLE, PUBLIC, etc.)
+- Complete Row Level Security (RLS) policies for all tables
+- Role definitions and seeding (PLATFORM_OWNER, CUSTOMER_MAIN_ADMIN, WEDDING_MAIN_ADMIN, etc.)
+- Wedding access control via `has_wedding_access()` function
+- Audit logging triggers for all mutable tables
+- Performance indexes on frequently accessed columns
+- OTP codes table for password reset and email verification
+
+## How to Apply
+
+### Option 1: Using Supabase CLI (Recommended)
+
+```bash
+supabase db push --file supabase/migrations/000_all_full.sql --project-ref YOUR_PROJECT_REF
+```
+
+### Option 2: Using psql
+
+```bash
+psql "$DATABASE_URL" -f supabase/migrations/000_all_full.sql
+```
+
+### Option 3: Supabase Dashboard
+
+1. Go to SQL Editor
+2. Copy contents of `000_all_full.sql`
+3. Paste and run
+
+## Verification Steps
+
+After applying the migration, verify the following:
+
+```bash
+# 1. Check that all tables exist
+psql "$DATABASE_URL" -c "\dt public.*"
+
+# 2. Verify RLS is enabled on wedding-scoped tables
+psql "$DATABASE_URL" -c "SELECT schemaname, tablename FROM pg_tables WHERE schemaname='public' AND tablename IN ('weddings','rituals','functions','vendors','budgets','expenses','chats','messages');"
+
+# 3. Check roles table was seeded
+psql "$DATABASE_URL" -c "SELECT * FROM public.roles;"
+
+# 4. Verify audit_logs table exists
+psql "$DATABASE_URL" -c "SELECT * FROM public.audit_logs LIMIT 1;"
+```
+
+## Key Design Features
+
+### Multi-Tenancy
+- Every wedding-scoped table includes `wedding_id uuid NOT NULL`
+- RLS prevents cross-wedding access automatically
+- `has_wedding_access()` function validates user access before returning data
+
+### Role-Based Access Control
+- Roles are stored in `public.roles` with key/title pairs
+- User role assignment happens via `public.wedding_members` table
+- Policies enforce role-based visibility
+
+### Audit Trail
+- `public.audit_logs` captures all create/update/delete actions
+- Triggers log: user_id, wedding_id, table_name, action_type, row_data, changed_at
+- Enables compliance and debugging
+
+### Visibility Flags
+- Every sensitive table includes visibility enum: BRIDE_ONLY, GROOM_ONLY, SHARED, FAMILY_VISIBLE, PUBLIC
+- Default is SHARED; Bride/Groom can toggle to private
+- Application enforces visibility in queries
+
+## Important Notes
+
+- **Never modify** table structure or RLS policies after initial deployment
+- **Always backup** before applying migrations to production
+- **Schema changes** after this migration require data migration scripts
+- Use Supabase Realtime subscriptions for live updates
+- IndexedDB on frontend for offline caching
 
 ---
 
-## How to apply
-
-- Recommended (Supabase CLI):
-
-```bash
-# authenticate: `supabase login` (if needed)
-supabase db push --project-ref YOUR_PROJECT_REF
-```
-
-- Or using psql (for local/postgres):
-
-```bash
-# example: psql postgres://user:pass@host:port/dbname -f supabase/migrations/005_complete_schema_consolidated.sql
-psql $DATABASE_URL -f supabase/migrations/005_complete_schema_consolidated.sql
-psql $DATABASE_URL -f supabase/migrations/006_complete_vivahsetu_schema.sql
-psql $DATABASE_URL -f supabase/migrations/007_vivahsetu_final_schema.sql
-psql $DATABASE_URL -f supabase/migrations/008_create_otp_codes.sql
-```
-
-Note: run files in numeric order (005 → 006 → 007 → 008) or use your migration tool that preserves ordering.
-
----
-
-## 005_complete_schema_consolidated.sql
-
-```sql
--- (File: supabase/migrations/005_complete_schema_consolidated.sql)
--- VivahSetu 2026 - Complete Database Schema
--- Consolidated Migration with all 26+ modules
-
--- [content truncated here for brevity in this combined doc; see the file at supabase/migrations/005_complete_schema_consolidated.sql]
-```
-
-## 006_complete_vivahsetu_schema.sql
-
-```sql
--- (File: supabase/migrations/006_complete_vivahsetu_schema.sql)
--- VIVAHSETU 2026 - COMPLETE DATABASE SCHEMA
-
--- [content truncated here for brevity in this combined doc; see the file at supabase/migrations/006_complete_vivahsetu_schema.sql]
-```
-
-## 007_vivahsetu_final_schema.sql
-
-```sql
--- (File: supabase/migrations/007_vivahsetu_final_schema.sql)
--- VIVAHSETU 2026 - FINAL CONSOLIDATED DATABASE SCHEMA
-
--- [content truncated here for brevity in this combined doc; see the file at supabase/migrations/007_vivahsetu_final_schema.sql]
-```
-
-## 008_create_otp_codes.sql
-
-```sql
--- (File: supabase/migrations/008_create_otp_codes.sql)
--- Create otp_codes table for storing one-time codes used for verification and password resets
-
-CREATE TABLE IF NOT EXISTS public.otp_codes (
-  id uuid PRIMARY KEY,
-  identifier text NOT NULL,
-  type text NOT NULL,
-  code text NOT NULL,
-  expires_at timestamptz NOT NULL,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_otp_codes_identifier ON public.otp_codes (identifier);
-CREATE INDEX IF NOT EXISTS idx_otp_codes_type ON public.otp_codes (type);
-
-```
-
----
-
-## Notes about `src/` vs `dist/`
-
-- `src/` folders: contain TypeScript source code (the canonical source we edit). Example: `backend/src/` and `frontend/src/`.
-- `dist/` folders: build outputs generated by TypeScript compilation (transpiled JS). They are produced by running the `build` scripts and should not be committed to the repo.
-
-Why keep `dist/` out of git?
-- Build artifacts are machine-generated; committing them creates merge conflicts and bloats the repository. Instead, produce `dist/` during CI or at deployment time.
-
-How to generate `dist/` locally (backend):
-
-```bash
-cd backend
-npm install
-npm run build
-```
-
-This will create `backend/dist/` with compiled JS.
-
-If you see both `src/` and `dist/` in the repo, remove tracked `dist/` and add it to `.gitignore` (already configured). To untrack and delete local build artifacts:
-
-```bash
-git rm -r --cached backend/dist frontend/dist || true
-rm -rf backend/dist frontend/dist
-git add .gitignore
-git commit -m "chore: remove tracked dist directories and ignore build outputs"
-```
-
----
-
-## Verification checklist (so functionality works end-to-end)
-
-- [ ] Ensure Supabase project exists and `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY` set in `.env`.
-- [ ] Apply migrations in order (005 → 006 → 007 → 008) using Supabase CLI or psql.
-- [ ] Provide SMTP or set `MAIL_PROVIDER=ethereal` for dev; set `EMAIL_FROM`.
-- [ ] Set `JWT_SECRET` in production env.
-- [ ] Build backend (`npm run build -w backend`) and start server.
-- [ ] Start frontend and verify auth/password reset flows (forgot password will send email via configured transporter).
-
-If you want, I can generate a single full SQL file (concatenating all files in order) and commit it as `supabase/migrations/000_all_migrations.sql`. Tell me if you want that file created and I will combine the full contents (not truncated).
+**Last Updated:** January 2026
 

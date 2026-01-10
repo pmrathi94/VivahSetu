@@ -8,6 +8,7 @@ import { ApplicationError, ErrorCode, ApiResponse } from '../models/responses'
 import { supabaseAdmin } from '../config/supabase'
 
 // Extend Express Request
+// eslint-disable-next-line @typescript-eslint/no-namespace
 declare global {
   namespace Express {
     interface Request {

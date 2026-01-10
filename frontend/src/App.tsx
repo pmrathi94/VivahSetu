@@ -7,11 +7,15 @@ import { PasswordResetSentPage } from './pages/auth/PasswordResetSent';
 import { ResetPasswordPage } from './pages/auth/ResetPassword';
 import { DashboardPage } from './pages/Dashboard';
 import { WeddingSetupPage } from './pages/wedding/Setup';
+import { TimelinePage } from './pages/wedding/Timeline';
 import { FunctionsPage } from './pages/wedding/Functions';
+import { VendorsPage } from './pages/wedding/Vendors';
 import { GuestsPage } from './pages/wedding/Guests';
 import { BudgetPage } from './pages/wedding/Budget';
 import { MediaPage } from './pages/wedding/Media';
 import { ChatPage } from './pages/wedding/Chat';
+import { AnalyticsPage } from './pages/wedding/Analytics';
+import { PackingPage } from './pages/wedding/Packing';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('token');
@@ -64,6 +68,22 @@ function App() {
           }
         />
         <Route
+          path="/wedding/timeline"
+          element={
+            <ProtectedRoute>
+              <TimelinePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/wedding/vendors"
+          element={
+            <ProtectedRoute>
+              <VendorsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/wedding/guests"
           element={
             <ProtectedRoute>
@@ -92,6 +112,22 @@ function App() {
           element={
             <ProtectedRoute>
               <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/wedding/analytics"
+          element={
+            <ProtectedRoute>
+              <AnalyticsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/wedding/packing"
+          element={
+            <ProtectedRoute>
+              <PackingPage />
             </ProtectedRoute>
           }
         />

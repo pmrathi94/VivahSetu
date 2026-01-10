@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MapPin, Phone, Mail, Star, Share2, Trash2, Plus } from 'lucide-react';
-import apiClient from '../../lib/api-client';
+import { apiClient } from '../../lib/api-client';
 
 interface Vendor {
   vendor_id: string;
@@ -22,7 +22,7 @@ interface Vendor {
   };
 }
 
-export default function Vendors() {
+export function VendorsPage() {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedState, setSelectedState] = useState('maharashtra');

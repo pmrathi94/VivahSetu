@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, Plus, Trash2, Download } from 'lucide-react';
-import apiClient from '../../lib/api-client';
+import { apiClient } from '../../lib/api-client';
 
 interface PackingItem {
   id: string;
@@ -18,7 +18,7 @@ interface PackingList {
   completion_percentage: number;
 }
 
-export default function Packing() {
+export function PackingPage() {
   const [packingLists, setPackingLists] = useState<PackingList[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedList, setSelectedList] = useState<PackingList | null>(null);

@@ -32,6 +32,8 @@ export function SignupPage() {
 
     setLoading(true);
     try {
+      // Remove confirmPassword before sending to API
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...data } = formData;
       const response = await apiClient.post('/auth/signup', data);
       localStorage.setItem('token', response.data.token);
