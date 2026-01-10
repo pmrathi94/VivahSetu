@@ -1,0 +1,46 @@
+{
+  "name": "vivahsetu",
+  "version": "1.0.0",
+  "description": "The Ultimate Indian Wedding Super App - Complete Wedding Planning Platform",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
+    "build": "npm run build -w frontend && npm run build -w backend",
+    "preview": "npm run preview -w frontend",
+    "lint": "npm run lint -w frontend && npm run lint -w backend",
+    "format": "prettier --write \"**/*.{js,ts,tsx,json,md}\"",
+    "install-all": "npm install && npm install -w frontend && npm install -w backend"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
+    "@types/node-geocoder": "^4.2.6",
+    "concurrently": "^8.2.0",
+    "prettier": "^3.0.0",
+    "terser": "^5.44.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/vivahsetu.git"
+  },
+  "keywords": [
+    "wedding",
+    "planning",
+    "indian",
+    "app",
+    "react",
+    "typescript",
+    "supabase"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
