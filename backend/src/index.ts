@@ -26,7 +26,20 @@ app.use(helmet())
 
 // CORS
 app.use(cors({
-  origin: config.CORS_ORIGIN,
+  origin: (incomingOrigin, callback) => {
+    // Allow non-browser requests (e.g., curl, server-to-server)
+    if (!incomingOrigin) return callback(null, true)
+
+    const allowed = (config as any).CORS_ORIGINS || [config.CORS_ORIGIN]
+    if (allowed.includes(incomingOrigin)) return callback(null, true)
+
+    // Allow GitHub Codespaces preview subdomains like https://...preview.app.github.dev
+    const codespacesRegex = /^https?:\/\/[a-z0-9-]+(?:-\d+)?\.preview\.app\.github\.dev(?::\d+)?$/i
+    if (codespacesRegex.test(incomingOrigin)) return callback(null, true)
+
+    // Deny other origins
+    return callback(new Error('Not allowed by CORS'))
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']

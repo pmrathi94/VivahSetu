@@ -20,11 +20,42 @@ export const config = {
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRY: process.env.JWT_EXPIRY || '7d',
 
+  // Email / SMTP
+  MAIL_PROVIDER: process.env.MAIL_PROVIDER || 'smtp',
+  EMAIL_FROM: process.env.EMAIL_FROM || 'no-reply@vivahsetu.com',
+  SMTP_HOST: process.env.SMTP_HOST,
+  SMTP_PORT: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : undefined,
+  SMTP_USER: process.env.SMTP_USER,
+  SMTP_PASS: process.env.SMTP_PASS,
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+
+  // OTP
+  OTP_TTL_SECONDS: process.env.OTP_TTL_SECONDS ? parseInt(process.env.OTP_TTL_SECONDS, 10) : 300,
+  OTP_LENGTH: process.env.OTP_LENGTH ? parseInt(process.env.OTP_LENGTH, 10) : 6,
+
+  // AI / Third-party
+  AI_PROVIDER: process.env.AI_PROVIDER || 'openai',
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+
+  // Geocoding
+  NODE_GEOCODER_PROVIDER: process.env.NODE_GEOCODER_PROVIDER || 'openstreetmap',
+  NODE_GEOCODER_API_KEY: process.env.NODE_GEOCODER_API_KEY,
+
+  // SMS (Twilio)
+  TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
+  TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
+  TWILIO_FROM: process.env.TWILIO_FROM,
+
   // Logging
   LOG_LEVEL: process.env.LOG_LEVEL || 'info',
 
   // CORS
+  // Support comma-separated origins in env and fall back to FRONTEND_URL
   CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  CORS_ORIGINS: (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:3000')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
 
   // Features
   ENABLE_AUDIT_LOGS: process.env.ENABLE_AUDIT_LOGS === 'true',
@@ -33,7 +64,7 @@ export const config = {
   // Validation
   validate: () => {
     if (process.env.NODE_ENV === 'production') {
-      const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']
+      const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'JWT_SECRET']
       const missing = required.filter(key => !process.env[key])
 
       if (missing.length > 0) {
