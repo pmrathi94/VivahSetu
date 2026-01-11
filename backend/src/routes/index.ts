@@ -25,6 +25,10 @@ router.get('/health', (_req: Request, res: Response) => res.json({ status: 'ok' 
 router.post('/auth/signup', authController.signupController);
 router.post('/auth/login', authController.loginController);
 router.post('/auth/logout', authMiddleware, authController.logoutController);
+router.post('/auth/forgot-password', authController.forgotPasswordController);
+router.post('/auth/reset-password', authController.resetPasswordController);
+router.post('/auth/send-otp', authController.sendOtpController);
+router.post('/auth/verify-otp', authController.verifyOtpController);
 
 // Wedding Routes (Protected)
 router.post('/weddings', authMiddleware, weddingsController.createWeddingController);

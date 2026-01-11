@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { LoginPage } from './pages/auth/Login';
 import { SignupPage } from './pages/auth/Signup';
+import { ForgotPasswordPage } from './pages/auth/ForgotPassword';
+import { PasswordResetSentPage } from './pages/auth/PasswordResetSent';
+import { ResetPasswordPage } from './pages/auth/ResetPassword';
 import { DashboardPage } from './pages/Dashboard';
 import { WeddingSetupPage } from './pages/wedding/Setup';
 import { FunctionsPage } from './pages/wedding/Functions';
@@ -23,6 +26,9 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/password-reset-sent" element={<PasswordResetSentPage />} />
 
         {/* Protected Routes */}
         <Route
