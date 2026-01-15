@@ -5,12 +5,23 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "install-all": "npm install && npm install -w frontend && npm install -w backend",
+    "setup": "node ./scripts/quickstart.js",
     "dev": "concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
+    "start": "npm run build && concurrently \"npm run start -w frontend\" \"npm run start:prod -w backend\"",
     "build": "npm run build -w frontend && npm run build -w backend",
     "preview": "npm run preview -w frontend",
+    "test": "npm run test -w backend && npm run test -w frontend",
+    "test:backend": "npm run test -w backend",
+    "test:frontend": "npm run test -w frontend",
+    "test:unit": "npm run test:unit -w backend",
+    "test:e2e": "npm run test:e2e -w backend",
+    "test:load": "npm run test:load -w backend",
+    "test:qa": "node ./tests/qa-automation.js",
     "lint": "npm run lint -w frontend && npm run lint -w backend",
     "format": "prettier --write \"**/*.{js,ts,tsx,json,md}\"",
-    "install-all": "npm install && npm install -w frontend && npm install -w backend"
+    "verify": "npm run verify-app",
+    "verify-app": "node ./tests/verify-app.js"
   },
   "workspaces": [
     "frontend",

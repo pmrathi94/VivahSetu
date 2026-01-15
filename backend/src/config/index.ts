@@ -1,11 +1,14 @@
 import dotenv from 'dotenv'
+import path from 'path'
 
-dotenv.config()
+// Load environment variables from .env.local (or .env if .env.local doesn't exist)
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
+dotenv.config() // Fallback to .env if .env.local not found
 
 export const config = {
   // Server
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '3001', 10),
+  PORT: parseInt(process.env.PORT || '4000', 10),
   API_VERSION: process.env.API_VERSION || 'v1',
 
   // Supabase
@@ -14,10 +17,11 @@ export const config = {
   SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
 
   // Frontend
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
   
-  // JWT
-  JWT_SECRET: process.env.JWT_SECRET,
+  // JWT (Managed by Supabase - not needed for Supabase Auth)
+  // JWT_SECRET is optional - Supabase handles token generation/validation
+  JWT_SECRET: process.env.JWT_SECRET || 'supabase-managed',
   JWT_EXPIRY: process.env.JWT_EXPIRY || '7d',
 
   // Email / SMTP
@@ -63,13 +67,12 @@ export const config = {
 
   // Validation
   validate: () => {
-    if (process.env.NODE_ENV === 'production') {
-      const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'JWT_SECRET']
-      const missing = required.filter(key => !process.env[key])
+    // Required: Only Supabase credentials (JWT is managed by Supabase)
+    const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_ANON_KEY']
+    const missing = required.filter(key => !process.env[key])
 
-      if (missing.length > 0) {
-        throw new Error(`Missing required environment variables: ${missing.join(', ')}`)
-      }
+    if (missing.length > 0) {
+      throw new Error(`Missing required Supabase environment variables: ${missing.join(', ')}`)
     }
   }
 }

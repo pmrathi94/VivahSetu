@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Backend API Server
+  backend:
+    image: node:20-alpine
+    container_name: vivahsetu-backend
+    working_dir: /app/backend
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+    command: npm run dev
+    depends_on:
+      - postgres
+
+  # Frontend Development Server
+  frontend:
+    image: node:20-alpine
+    container_name: vivahsetu-frontend
+    working_dir: /app/frontend
+    environment:
+      VITE_API_URL: http://localhost:4000/api
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+      VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    command: npm run dev -- --host
+
+  # PostgreSQL Database (Optional - can use Supabase instead)
+  postgres:
+    image: postgres:15-alpine
+    container_name: vivahsetu-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-vivahsetu}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: vivahsetu-network

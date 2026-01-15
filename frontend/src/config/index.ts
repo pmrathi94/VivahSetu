@@ -87,7 +87,7 @@ const buildConfig = (): AppConfig => {
     
     // API configuration
     api: {
-      baseUrl: validateEnv('API_URL', 'http://localhost:3001'),
+      baseUrl: validateEnv('BACKEND_URL', 'http://localhost:4000'),
       timeout: parseInt(validateEnv('API_TIMEOUT', '30000')),
       retryAttempts: parseInt(validateEnv('API_RETRY_ATTEMPTS', '3')),
     },

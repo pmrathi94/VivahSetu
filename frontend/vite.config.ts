@@ -18,13 +18,13 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 5173,
     strictPort: false,
-    host: 'localhost',
+    host: '0.0.0.0',
     cors: true,
     proxy: {
       '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:3001',
+        target: process.env.VITE_API_URL || 'http://localhost:4000',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''),

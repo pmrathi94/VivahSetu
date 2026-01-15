@@ -58,7 +58,7 @@ export function DashboardPage() {
             <h1 className="text-2xl font-bold text-gray-800">VivahSetu</h1>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-gray-700">Welcome, {user.fullName}</span>
+            <span className="text-gray-700">Welcome, {user?.fullName}</span>
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-pink-600 transition"

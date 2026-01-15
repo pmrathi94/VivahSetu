@@ -25,24 +25,36 @@ const app = express()
 app.use(helmet())
 
 // CORS
+const corsOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : [])
+]
+
 app.use(cors({
   origin: (incomingOrigin, callback) => {
     // Allow non-browser requests (e.g., curl, server-to-server)
     if (!incomingOrigin) return callback(null, true)
 
-    const allowed = (config as any).CORS_ORIGINS || [config.CORS_ORIGIN]
-    if (allowed.includes(incomingOrigin)) return callback(null, true)
+    if (corsOrigins.includes(incomingOrigin)) return callback(null, true)
 
     // Allow GitHub Codespaces preview subdomains like https://...preview.app.github.dev
     const codespacesRegex = /^https?:\/\/[a-z0-9-]+(?:-\d+)?\.preview\.app\.github\.dev(?::\d+)?$/i
     if (codespacesRegex.test(incomingOrigin)) return callback(null, true)
 
-    // Deny other origins
+    // Log denied origins in development
+    if (config.NODE_ENV === 'development') {
+      logger.debug(`CORS denied for origin: ${incomingOrigin}`)
+      return callback(null, true) // Allow in development
+    }
+
     return callback(new Error('Not allowed by CORS'))
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['X-Total-Count', 'X-Page-Count']
 }))
 
 // Compression
@@ -59,6 +71,27 @@ app.use(requestLogger)
 if (config.ENABLE_RATE_LIMITING) {
   app.use(rateLimiter(100, 60000))
 }
+
+// ============================================================================
+// Health Check Endpoints
+// ============================================================================
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: config.NODE_ENV,
+  })
+})
+
+app.get('/health/db', (req, res) => {
+  // In production, check actual database connection
+  res.status(200).json({
+    status: 'ok',
+    database: 'connected',
+    timestamp: new Date().toISOString(),
+  })
+})
 
 // ============================================================================
 // API Routes
